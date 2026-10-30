@@ -15,7 +15,13 @@ export async function signIn(formData: FormData) {
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) redirect("/login?error=Incorrect+email+or+password");
+  if (error) {
+    if (error.code === "email_not_confirmed") {
+      redirect("/login?error=" + encodeURIComponent("Please confirm your email first. Check your inbox for the confirmation link."));
+    }
+    if (error.code === "invalid_credentials") redirect("/login?error=Incorrect+email+or+password");
+    redirect("/login?error=" + encodeURIComponent("Could not sign in right now. Please try again."));
+  }
   redirect("/dashboard");
 }
 
