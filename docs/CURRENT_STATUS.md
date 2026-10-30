@@ -4,8 +4,9 @@ Last updated: 2026-10-30
 
 ## Environment
 - Supabase project `transportos` (ref `xetkenscwizknicfobdb`), org tashmak, region eu-west-2 (London, UK — not EU, not SA). Separate from `printing-management`, which has not been touched.
-- Vercel: no team (personal account). Not yet used.
-- GitHub: not connected yet; no repo.
+- Vercel: project `transportos` in team trade-vision2 (shared with tashmak-system and tradevision-ai; do not touch those). Region cpt1 via vercel.json. First build on feature/foundation: READY (commit 93728c9).
+- GitHub: Hydro-za/transportos (private). Work on branch feature/foundation; main is still empty.
+- Sandbox cannot reach npm: packages are installed and built by Vercel only, so typecheck/build errors surface there.
 
 ## Completed
 - Architecture and schema design approved by Damian ("Ya good").
@@ -23,14 +24,14 @@ Two test companies/users: each sees only own company, members, roles, audit rows
 - Advisor notes: `document_sequences` and `platform_admins` have RLS but no policies (intentional, service role only); `create_organization` is callable by signed-in users (intentional).
 - Members with `members.manage` could assign the Owner role; add a guard (only Owners assign Owner, cannot remove last Owner) before launch.
 - Add rate limit on company creation.
-- Migrations live only in Supabase for now; export them into `supabase/migrations/` once the repo exists.
+- Vercel has Supabase-integration env vars (SUPABASE_URL, keys, POSTGRES_*) of unknown source project; verify they point at `transportos` (ref xetkenscwizknicfobdb) and not another project before using them.
+- Production target currently deploys feature/foundation because main is empty; set production branch to main after first merge.
 
 ## Remaining (Phase 1)
-1. Connect GitHub, create `transportos` repo.
-2. Scaffold Next.js app, deploy to Vercel (cpt1), set env vars.
+1. Verify Vercel env vars point at the transportos Supabase project.
 3. Auth screens: sign-up, sign-in, create company, company switcher.
 4. Server guard `requirePermission()` and Zod validation pattern.
 5. Cross-tenant test suite in repo.
 
 ## Exact next task
-Connect GitHub, then scaffold the Next.js app with Supabase auth and the create-company flow.
+Build sign-up, sign-in, create-company flow and session middleware, with a cross-tenant test.
