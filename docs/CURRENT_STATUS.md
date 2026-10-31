@@ -1,6 +1,6 @@
 # TransportOS — CURRENT_STATUS
 
-Last updated: 2026-10-30
+Last updated: 2026-10-31
 
 ## Environment
 - Supabase project `transportos` (ref `xetkenscwizknicfobdb`), org tashmak, region eu-west-2 (London, UK — not EU, not SA). Separate from `printing-management`, which has not been touched.
@@ -20,7 +20,11 @@ Last updated: 2026-10-30
 ## Tests performed (rolled back, no test data left)
 Two test companies/users: each sees only own company, members, roles, audit rows; cross-company update and member insert blocked; audit rows cannot be deleted; `next_number` not callable by users; numbering is per company (Q-2026-0001, 0002; other company starts at 0001); Owner role has 38 permissions.
 
+## Business model (decided 2026-10-31)
+TransportOS is sold to companies. No public sign-up. Platform admin (Damian, `/platform`) creates the company and the owner login (email + one-time temporary password); owner must change password on first sign-in. Migrations 0006 (`provision_organization`, service role only) and 0007 (self-service `create_organization` revoked). Old `create_organization` still exists but is not callable by users; drop later.
+
 ## Known issues / to do
+- ACTION (Damian): in Supabase dashboard (project transportos) Authentication > Sign In / Providers, turn OFF "Allow new users to sign up". Until then anyone can create a login (they cannot create or join a company).
 - Advisor notes: `document_sequences` and `platform_admins` have RLS but no policies (intentional, service role only); `create_organization` is callable by signed-in users (intentional).
 - Members with `members.manage` could assign the Owner role; add a guard (only Owners assign Owner, cannot remove last Owner) before launch.
 - Add rate limit on company creation.
@@ -28,10 +32,9 @@ Two test companies/users: each sees only own company, members, roles, audit rows
 - Production target currently deploys feature/foundation because main is empty; set production branch to main after first merge.
 
 ## Remaining (Phase 1)
-1. Verify Vercel env vars point at the transportos Supabase project.
-3. Auth screens: sign-up, sign-in, create company, company switcher.
+1. Company switcher for users in more than one company; invite staff to a company (owner-created logins).
 4. Server guard `requirePermission()` and Zod validation pattern.
 5. Cross-tenant test suite in repo.
 
 ## Exact next task
-Build sign-up, sign-in, create-company flow and session middleware, with a cross-tenant test.
+Test the platform flow end to end (create company, owner first login, password change), then customers module.

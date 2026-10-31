@@ -37,5 +37,3 @@ end;
 $$;
 revoke all on function public.provision_organization(text, text, uuid) from public, anon, authenticated;
 grant execute on function public.provision_organization(text, text, uuid) to service_role;
-
-drop function public.create_organization(text, text);
