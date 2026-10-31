@@ -3,8 +3,8 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 type CookieItem = { name: string; value: string; options: CookieOptions };
 
-const PROTECTED = ["/dashboard", "/onboarding"];
-const AUTH_PAGES = ["/login", "/signup"];
+const PROTECTED = ["/dashboard", "/platform", "/change-password"];
+const AUTH_PAGES = ["/login"];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -36,6 +36,12 @@ export async function middleware(request: NextRequest) {
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+  if (user && user.user_metadata?.must_change_password === true && isProtected && path !== "/change-password") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/change-password";
     url.search = "";
     return NextResponse.redirect(url);
   }

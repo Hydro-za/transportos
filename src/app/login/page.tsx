@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { AuthCard, Field, Notice, SubmitButton } from "@/components/ui";
 import { signIn } from "./actions";
 
@@ -14,10 +13,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <SubmitButton>Sign in</SubmitButton>
       </form>
       <p className="mt-6 text-sm" style={{ color: "var(--muted)" }}>
-        New to TransportOS?{" "}
-        <Link href="/signup" className="font-medium" style={{ color: "var(--accent)" }}>
-          Create an account
-        </Link>
+        Your login is provided by your company administrator.
       </p>
     </AuthCard>
   );
