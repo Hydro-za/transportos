@@ -109,3 +109,42 @@ test("quote: validation errors", () => {
   assert.ok("error" in buildQuote({ ...base, distanceKm: null }));
   assert.ok("error" in buildQuote({ ...base, pricingMethod: "per_tonne", weightKg: null }));
 });
+
+import { fuelStatsByRecord } from "../src/lib/fuel.ts";
+import { maintenanceAlerts, expiryAlerts } from "../src/lib/maintenance.ts";
+
+test("fuel: full-tank consumption between consecutive full fills", () => {
+  const rec = (id, odo, litres, cents, full = true, date = "2026-01-01") => ({ id, vehicle_id: "v1", fuel_date: date, litres, total_cents: cents, odometer_km: odo, full_tank: full });
+  const stats = fuelStatsByRecord([
+    rec("a", 10000, 300, 600000),
+    rec("b", 10500, 150, 300000, false),
+    rec("c", 11000, 150, 300000, true),
+  ]);
+  assert.equal(stats.has("a"), false); // first full tank: no baseline
+  assert.equal(stats.has("b"), false); // partial
+  const c = stats.get("c");
+  assert.equal(c.km, 1000);
+  assert.equal(c.litres, 300);
+  assert.equal(Math.round(c.litresPer100km * 10) / 10, 30);
+  assert.equal(c.costPerKmCents, 600);
+});
+
+test("maintenance alerts by date and odometer", () => {
+  const a = maintenanceAlerts(
+    [
+      { vehicle_id: "1", registration_no: "A", odometer_km: 100, next_service_km: null, next_service_date: "2026-11-10" },
+      { vehicle_id: "2", registration_no: "B", odometer_km: 99500, next_service_km: 100000, next_service_date: null },
+      { vehicle_id: "3", registration_no: "C", odometer_km: 5, next_service_km: null, next_service_date: "2026-10-01" },
+      { vehicle_id: "4", registration_no: "D", odometer_km: 5, next_service_km: 90000, next_service_date: "2027-06-01" },
+    ],
+    "2026-11-02",
+  );
+  assert.equal(a.length, 3);
+  assert.equal(a.find((x) => x.registration_no === "C").overdue, true);
+  assert.equal(a.find((x) => x.registration_no === "B").overdue, false);
+});
+
+test("expiry alerts", () => {
+  const e = expiryAlerts([{ label: "x", date: "2026-10-01" }, { label: "y", date: "2026-12-01" }, { label: "z", date: "2027-12-01" }, { label: "n", date: null }], "2026-11-02");
+  assert.deepEqual(e.map((i) => [i.label, i.expired]), [["x", true], ["y", false]]);
+});
