@@ -93,3 +93,40 @@ export async function requireAccess(permission: string) {
   if (!ctx.organizationId || !ctx.permissions.has(permission)) redirect("/dashboard");
   return { ...ctx, organizationId: ctx.organizationId };
 }
+
+export type BusinessSettings = {
+  name: string;
+  registration_no: string | null;
+  vat_no: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string;
+  vatRatePct: number;
+  quotationValidityDays: number;
+  paymentTerms: string;
+  conditions: string;
+  bankDetails: string;
+};
+
+/** Business details and defaults used by quotations and invoices. */
+export async function getBusinessSettings(ctx: AppContext): Promise<BusinessSettings> {
+  const { data } = await ctx.supabase
+    .from("organizations")
+    .select("name, registration_no, vat_no, phone, email, address, settings")
+    .maybeSingle();
+  const s = (data?.settings ?? {}) as Record<string, unknown>;
+  const a = (data?.address ?? {}) as Record<string, unknown>;
+  return {
+    name: data?.name ?? ctx.businessName,
+    registration_no: data?.registration_no ?? null,
+    vat_no: data?.vat_no ?? null,
+    phone: data?.phone ?? null,
+    email: data?.email ?? null,
+    address: typeof a.text === "string" ? a.text : "",
+    vatRatePct: typeof s.vat_rate_pct === "number" ? s.vat_rate_pct : 15,
+    quotationValidityDays: typeof s.quotation_validity_days === "number" ? s.quotation_validity_days : 14,
+    paymentTerms: typeof s.payment_terms === "string" ? s.payment_terms : "Payment within 30 days of invoice date.",
+    conditions: typeof s.conditions === "string" ? s.conditions : "",
+    bankDetails: typeof s.bank_details === "string" ? s.bank_details : "",
+  };
+}

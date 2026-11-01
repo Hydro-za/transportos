@@ -78,3 +78,34 @@ test("totals: discount never exceeds subtotal and sums exactly", () => {
   assert.equal(t.discountCents, 10000);
   assert.equal(t.totalCents, 0);
 });
+
+import { buildQuote } from "../src/lib/quotation.ts";
+
+const base = {
+  pricingMethod: "per_km", rateCents: 2200, distanceKm: 1500, weightKg: 28000,
+  collection: "Cape Town", delivery: "Durban", fuelSurchargePct: 10,
+  loadingCents: 50000, offloadingCents: 0, waitingCents: 0, additionalStopsCents: 0, tollsCents: 120000,
+  otherCents: 0, otherDescription: "", discountCents: 0, vatTreatment: "standard", vatRatePct: 15,
+};
+
+test("quote: per-km with fuel surcharge, loading and tolls, 15% VAT", () => {
+  const q = buildQuote(base);
+  assert.ok(!("error" in q));
+  // transport 1500 x R22 = R33,000; fuel 10% = R3,300; loading R500; tolls R1,200
+  assert.equal(q.lines.length, 4);
+  assert.equal(q.totals.subtotalCents, 3300000 + 330000 + 50000 + 120000);
+  assert.equal(q.totals.vatCents, Math.round(q.totals.subtotalCents * 0.15));
+  assert.equal(q.totals.totalCents, q.totals.subtotalCents + q.totals.vatCents);
+});
+
+test("quote: zero-rated export has no VAT", () => {
+  const q = buildQuote({ ...base, vatTreatment: "zero_rated" });
+  assert.ok(!("error" in q));
+  assert.equal(q.totals.vatCents, 0);
+});
+
+test("quote: validation errors", () => {
+  assert.ok("error" in buildQuote({ ...base, rateCents: 0 }));
+  assert.ok("error" in buildQuote({ ...base, distanceKm: null }));
+  assert.ok("error" in buildQuote({ ...base, pricingMethod: "per_tonne", weightKg: null }));
+});
