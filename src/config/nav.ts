@@ -4,6 +4,8 @@ export type NavItem = { href: string; label: string; permission?: string };
 export const NAV: NavItem[] = [
   { href: "/dashboard", label: "Overview" },
   { href: "/quotations", label: "Quotations", permission: "quotations.read" },
+  { href: "/jobs", label: "Jobs & Loads", permission: "jobs.read" },
+  { href: "/dispatch", label: "Dispatch", permission: "dispatch.read" },
   { href: "/customers", label: "Customers", permission: "customers.read" },
   { href: "/team", label: "Team", permission: "members.manage" },
   { href: "/settings", label: "Settings", permission: "settings.update" },

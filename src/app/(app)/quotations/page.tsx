@@ -3,10 +3,7 @@ import { requireAccess } from "@/server/auth/session";
 import { Badge, Card, EmptyState, PageHeader, ghostButtonClass, ghostButtonStyle, linkButtonClass, linkButtonStyle } from "@/components/ui";
 import { formatZar } from "@/lib/money";
 import { formatDate } from "@/lib/forms";
-
-export const QUOTE_TONE: Record<string, "neutral" | "good" | "warn" | "bad"> = {
-  draft: "neutral", sent: "warn", viewed: "warn", accepted: "good", converted: "good", rejected: "bad", expired: "bad",
-};
+import { QUOTE_TONE } from "@/lib/status";
 
 const STATUSES = ["draft", "sent", "accepted", "rejected", "expired", "converted"];
 

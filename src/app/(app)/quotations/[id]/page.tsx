@@ -8,7 +8,7 @@ import { centsToRandsString, formatZar } from "@/lib/money";
 import { formatDate, formatDateTime } from "@/lib/forms";
 import { QUOTATION_FIELDS } from "../fields";
 import { convertToJob, duplicateQuotation, setQuotationStatus, updateQuotation } from "../actions";
-import { QUOTE_TONE } from "../page";
+import { QUOTE_TONE } from "@/lib/status";
 
 function ActionButton({ id, to, label, action }: { id: string; to?: string; label: string; action: (fd: FormData) => Promise<void> }) {
   return (
