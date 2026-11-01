@@ -3,7 +3,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 type CookieItem = { name: string; value: string; options: CookieOptions };
 
-const PROTECTED = ["/dashboard", "/platform", "/change-password"];
+const PROTECTED = ["/dashboard", "/team", "/change-password"];
 const AUTH_PAGES = ["/login"];
 
 export async function middleware(request: NextRequest) {

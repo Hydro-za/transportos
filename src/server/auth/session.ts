@@ -1,6 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type Membership = {
   organization_id: string;
@@ -28,4 +29,29 @@ export async function getMemberships(): Promise<{ user: { id: string; email?: st
     .eq("status", "active");
   if (error) throw new Error("Could not load company membership");
   return { user: { id: user.id, email: user.email }, memberships: (data ?? []) as unknown as Membership[] };
+}
+
+/**
+ * Server-side permission gate for pages and server actions. Looks up the caller's
+ * active membership and checks the role actually holds the permission in the database.
+ */
+export async function requirePermission(permission: string) {
+  const { user } = await requireUser();
+  const admin = createAdminClient();
+  const { data: member } = await admin
+    .from("organization_members")
+    .select("organization_id, role_id, roles(name)")
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .maybeSingle();
+  if (!member) redirect("/dashboard");
+  const { data: allowed } = await admin
+    .from("role_permissions")
+    .select("permission_key")
+    .eq("role_id", member.role_id)
+    .eq("permission_key", permission)
+    .maybeSingle();
+  if (!allowed) redirect("/dashboard");
+  const roleName = (member.roles as unknown as { name: string } | null)?.name ?? "";
+  return { user, organizationId: member.organization_id as string, roleName };
 }

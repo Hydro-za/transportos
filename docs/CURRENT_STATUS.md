@@ -1,6 +1,6 @@
 # TransportOS — CURRENT_STATUS
 
-Last updated: 2026-10-31
+Last updated: 2026-11-01
 
 ## Environment
 - Supabase project `transportos` (ref `xetkenscwizknicfobdb`), org tashmak, region eu-west-2 (London, UK — not EU, not SA). Separate from `printing-management`, which has not been touched.
@@ -20,11 +20,16 @@ Last updated: 2026-10-31
 ## Tests performed (rolled back, no test data left)
 Two test companies/users: each sees only own company, members, roles, audit rows; cross-company update and member insert blocked; audit rows cannot be deleted; `next_number` not callable by users; numbering is per company (Q-2026-0001, 0002; other company starts at 0001); Owner role has 38 permissions.
 
-## Business model (decided 2026-10-31)
-TransportOS is sold to companies. No public sign-up. Platform admin (Damian, `/platform`) creates the company and the owner login (email + one-time temporary password); owner must change password on first sign-in. Migrations 0006 (`provision_organization`, service role only) and 0007 (self-service `create_organization` revoked). Old `create_organization` still exists but is not callable by users; drop later.
+## Business model (decided 2026-11-01, replaces the earlier SaaS plan)
+One business, one installation. No public sign-up and no platform/multi-company admin. System name is generic ("Transport Manager", one constant in `src/config/app.ts`).
+- Database keeps the organization/role/permission structure but is locked to exactly one organization (migration 0008, unique index). RLS and `organization_id` on future tables stay as designed.
+- The business row was created for Damian's account as Owner (name "My Transport Business", rename later in Settings).
+- Owners create more Owner and Dispatcher logins at `/team` (temporary password shown once, forced change on first sign-in); owners can also reset passwords and disable/enable people. The last active owner cannot be disabled; owners cannot change their own access.
+- Removed: /platform, platform_admins checks. Table `platform_admins`, functions `provision_organization` (service role only) and `create_organization` (not callable by users) remain unused; drop in a later cleanup.
+- Subscription plans/usage limits (old Phase 8) are no longer planned.
 
 ## Known issues / to do
-- ACTION (Damian): in Supabase dashboard (project transportos) Authentication > Sign In / Providers, turn OFF "Allow new users to sign up". Until then anyone can create a login (they cannot create or join a company).
+- ACTION (Damian): in Supabase dashboard (project transportos) Authentication > Sign In / Providers, turn OFF "Allow new users to sign up". Until then anyone can create a login (it has no access to any business data).
 - Advisor notes: `document_sequences` and `platform_admins` have RLS but no policies (intentional, service role only); `create_organization` is callable by signed-in users (intentional).
 - Members with `members.manage` could assign the Owner role; add a guard (only Owners assign Owner, cannot remove last Owner) before launch.
 - Add rate limit on company creation.
@@ -37,4 +42,4 @@ TransportOS is sold to companies. No public sign-up. Platform admin (Damian, `/p
 5. Cross-tenant test suite in repo.
 
 ## Exact next task
-Test the platform flow end to end (create company, owner first login, password change), then customers module.
+Test: sign in as Damian, open /team, create a Dispatcher, sign in as them and change password. Then customers module.

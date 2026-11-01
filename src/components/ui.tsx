@@ -77,3 +77,23 @@ export function Notice({ kind, children }: { kind: "error" | "info"; children: R
     </p>
   );
 }
+
+export function SelectField({ label, name, options }: { label: string; name: string; options: { value: string; label: string }[] }) {
+  return (
+    <label className="block text-sm font-medium">
+      {label}
+      <select
+        name={name}
+        required
+        className="mt-1 block w-full rounded-xl border bg-transparent px-3 py-2.5 text-base outline-none focus:ring-2"
+        style={{ borderColor: "var(--border)" }}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}

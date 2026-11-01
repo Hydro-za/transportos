@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { APP_NAME } from "@/config/app";
 
 export const metadata: Metadata = {
-  title: "TransportOS",
-  description: "Logistics, fleet and transport management for South African trucking companies.",
+  title: APP_NAME,
+  description: "Fleet, jobs and dispatch management.",
 };
 
 export const viewport: Viewport = {
