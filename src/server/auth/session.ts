@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -54,4 +55,41 @@ export async function requirePermission(permission: string) {
   if (!allowed) redirect("/dashboard");
   const roleName = (member.roles as unknown as { name: string } | null)?.name ?? "";
   return { user, organizationId: member.organization_id as string, roleName };
+}
+
+export type AppContext = {
+  supabase: Awaited<ReturnType<typeof createClient>>;
+  user: { id: string; email?: string };
+  organizationId: string | null;
+  businessName: string;
+  roleName: string;
+  permissions: Set<string>;
+};
+
+/** Signed-in user's business, role and permissions (user-scoped client, RLS applies). Cached per request. */
+export const getContext = cache(async (): Promise<AppContext> => {
+  const { supabase, user } = await requireUser();
+  const { data: member } = await supabase
+    .from("organization_members")
+    .select("organization_id, role_id, organizations(name), roles(name)")
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .maybeSingle();
+  const base = { supabase, user: { id: user.id, email: user.email } };
+  if (!member) return { ...base, organizationId: null, businessName: "", roleName: "", permissions: new Set<string>() };
+  const { data: perms } = await supabase.from("role_permissions").select("permission_key").eq("role_id", member.role_id);
+  return {
+    ...base,
+    organizationId: member.organization_id as string,
+    businessName: (member.organizations as unknown as { name: string } | null)?.name ?? "",
+    roleName: (member.roles as unknown as { name: string } | null)?.name ?? "",
+    permissions: new Set((perms ?? []).map((p) => p.permission_key as string)),
+  };
+});
+
+/** Page/action gate: redirects unless the caller holds the permission. Returns a context with a guaranteed organizationId. */
+export async function requireAccess(permission: string) {
+  const ctx = await getContext();
+  if (!ctx.organizationId || !ctx.permissions.has(permission)) redirect("/dashboard");
+  return { ...ctx, organizationId: ctx.organizationId };
 }

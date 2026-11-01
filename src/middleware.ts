@@ -3,7 +3,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 type CookieItem = { name: string; value: string; options: CookieOptions };
 
-const PROTECTED = ["/dashboard", "/team", "/change-password"];
+const PUBLIC_PATHS = ["/", "/login"];
 const AUTH_PAGES = ["/login"];
 
 export async function middleware(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isProtected = PROTECTED.some((p) => path === p || path.startsWith(p + "/"));
+  const isProtected = !PUBLIC_PATHS.includes(path);
   const isAuthPage = AUTH_PAGES.includes(path);
 
   if (!user && isProtected) {

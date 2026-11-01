@@ -97,3 +97,55 @@ export function SelectField({ label, name, options }: { label: string; name: str
     </label>
   );
 }
+
+export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
+  return (
+    <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        {subtitle ? (
+          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+            {subtitle}
+          </p>
+        ) : null}
+      </div>
+      {action}
+    </header>
+  );
+}
+
+export function Card({ title, children }: { title?: string; children: ReactNode }) {
+  return (
+    <section className="mb-6 rounded-3xl border p-5 sm:p-6" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+      {title ? <h2 className="mb-4 text-lg font-medium">{title}</h2> : null}
+      {children}
+    </section>
+  );
+}
+
+export function EmptyState({ children }: { children: ReactNode }) {
+  return (
+    <p className="py-6 text-center text-sm" style={{ color: "var(--muted)" }}>
+      {children}
+    </p>
+  );
+}
+
+export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "good" | "warn" | "bad" }) {
+  const colors = {
+    neutral: "var(--muted)",
+    good: "#1a7f37",
+    warn: "#b36b00",
+    bad: "#d70015",
+  } as const;
+  return (
+    <span className="inline-block rounded-full border px-2 py-0.5 text-xs font-medium" style={{ borderColor: colors[tone], color: colors[tone] }}>
+      {children}
+    </span>
+  );
+}
+
+export const linkButtonClass = "inline-block rounded-xl px-4 py-2 text-sm font-medium text-white";
+export const linkButtonStyle = { background: "var(--accent)" } as const;
+export const ghostButtonClass = "inline-block rounded-xl border px-3 py-2 text-sm font-medium";
+export const ghostButtonStyle = { borderColor: "var(--border)" } as const;
