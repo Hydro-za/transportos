@@ -7,6 +7,7 @@ export const NAV: NavItem[] = [
   { href: "/jobs", label: "Jobs & Loads", permission: "jobs.read" },
   { href: "/dispatch", label: "Dispatch", permission: "dispatch.read" },
   { href: "/customers", label: "Customers", permission: "customers.read" },
+  { href: "/invoices", label: "Invoices", permission: "invoices.read" },
   { href: "/fleet", label: "Fleet", permission: "fleet.read" },
   { href: "/drivers", label: "Drivers & Staff", permission: "drivers.read" },
   { href: "/maintenance", label: "Maintenance", permission: "maintenance.read" },

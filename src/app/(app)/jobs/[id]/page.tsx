@@ -9,6 +9,7 @@ import { formatDateTime } from "@/lib/forms";
 import { JOB_LABEL, JOB_STATUSES, JOB_TONE, TRIP_TONE } from "@/lib/status";
 import type { FieldDef } from "@/lib/forms";
 import { JOB_FIELDS } from "../fields";
+import { createInvoiceFromJob } from "../../invoices/actions";
 import { addJobEvent, allocateTrip, setJobStatus, setTripStatus, updateJob } from "../actions";
 
 const NEXT_TRIP: Record<string, { to: string; label: string }[]> = {
@@ -65,6 +66,9 @@ export default async function JobPage({ params, searchParams }: { params: Promis
         action={
           <div className="flex items-center gap-2">
             <Badge tone={JOB_TONE[job.status] ?? "neutral"}>{JOB_LABEL[job.status] ?? job.status}</Badge>
+            {ctx.permissions.has("invoices.write") && job.status !== "cancelled" ? (
+              <form action={createInvoiceFromJob}><input type="hidden" name="job_id" value={job.id} /><button className={ghostButtonClass} style={ghostButtonStyle}>Create invoice</button></form>
+            ) : null}
             <Link href="/jobs" className={ghostButtonClass} style={ghostButtonStyle}>Back</Link>
           </div>
         }
