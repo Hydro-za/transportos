@@ -148,3 +148,17 @@ test("expiry alerts", () => {
   const e = expiryAlerts([{ label: "x", date: "2026-10-01" }, { label: "y", date: "2026-12-01" }, { label: "z", date: "2027-12-01" }, { label: "n", date: null }], "2026-11-02");
   assert.deepEqual(e.map((i) => [i.label, i.expired]), [["x", true], ["y", false]]);
 });
+
+// profitability
+import { jobProfit } from "../src/lib/profit.ts";
+test("jobProfit: draft/cancelled invoices excluded, costs summed", () => {
+  const r = jobProfit([{ id: "a", number: "J1", title: "t", customer: "c" }], [
+    { job_id: "a", subtotal_cents: 100000, discount_cents: 10000, status: "sent" },
+    { job_id: "a", subtotal_cents: 999, discount_cents: 0, status: "draft" },
+    { job_id: "a", subtotal_cents: 999, discount_cents: 0, status: "cancelled" },
+  ], [{ job_id: "a", amount_cents: 30000 }, { job_id: "a", amount_cents: 20000 }]);
+  assert.equal(r[0].invoicedCents, 90000);
+  assert.equal(r[0].costCents, 50000);
+  assert.equal(r[0].profitCents, 40000);
+  assert.ok(Math.abs(r[0].marginPct - 44.444) < 0.01);
+});

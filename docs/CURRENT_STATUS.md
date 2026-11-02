@@ -1,45 +1,39 @@
-# TransportOS — CURRENT_STATUS
+# Transport Manager — CURRENT_STATUS
 
-Last updated: 2026-11-01
+Last updated: 2026-11-02
 
 ## Environment
-- Supabase project `transportos` (ref `xetkenscwizknicfobdb`), org tashmak, region eu-west-2 (London, UK — not EU, not SA). Separate from `printing-management`, which has not been touched.
-- Vercel: project `transportos` in team trade-vision2 (shared with tashmak-system and tradevision-ai; do not touch those). Region cpt1 via vercel.json. First build on feature/foundation: READY (commit 93728c9).
-- GitHub: Hydro-za/transportos (private). Work on branch feature/foundation; main is still empty.
-- Sandbox cannot reach npm: packages are installed and built by Vercel only, so typecheck/build errors surface there.
+- Supabase project `transportos` (ref `xetkenscwizknicfobdb`, eu-west-2 London). Separate from `printing-management` (untouched).
+- Vercel project `transportos` in team trade-vision2, region cpt1. Shared team projects tashmak-system and tradevision-ai are untouched.
+- GitHub `Hydro-za/transportos`, branch `feature/foundation` (main still empty). Latest Vercel build READY.
+- Sandbox cannot reach npm; Vercel builds/typechecks. Pure logic tested with `npm test` (15 passing).
 
-## Completed
-- Architecture and schema design approved by Damian ("Ya good").
-- Migrations applied to `transportos` only:
-  - 0001 extensions (btree_gist, pg_trgm) + `set_updated_at`
-  - 0002 tenancy core: organizations, user_profiles, roles, permissions, role_permissions, organization_members, platform_admins; RLS on all; composite FK so a member's role must belong to the same company; profile auto-created on sign-up
-  - 0003 39 permissions, 6 role templates (Owner, Administrator, Dispatcher, Finance, Fleet Manager, Driver), `create_organization()` copies templates and makes the caller Owner
-  - 0004 append-only `audit_logs` (triggers on organizations, members, roles), gap-safe `next_number()` (internal, called by triggers on numbered tables later)
-  - 0005 RLS helper functions moved to `private` schema (not exposed through the API)
+## Business model
+One business, one installation, no public sign-up. Owners create Owner/Dispatcher logins at /team (temporary password, forced change on first sign-in). RLS on every table via organization_id and permissions.
 
-## Tests performed (rolled back, no test data left)
-Two test companies/users: each sees only own company, members, roles, audit rows; cross-company update and member insert blocked; audit rows cannot be deleted; `next_number` not callable by users; numbering is per company (Q-2026-0001, 0002; other company starts at 0001); Owner role has 38 permissions.
+## Built
+- Auth, forced password change, Team, Settings (business details, VAT %, terms, bank details)
+- Customers; Quotations (pricing methods, VAT, discount, printable PDF, accept, convert to job)
+- Jobs & loads (status, timeline), Dispatch with allocation (trucks/trailers/drivers; DB-enforced double-booking protection, override needs dispatch.override)
+- Fleet, trailers, drivers (licence/PDP expiry alerts), maintenance (service alerts), fuel (L/100 km, cost/km), expenses
+- Invoices created from a job (copies quotation lines or agreed price), send, cancel, append-only payments (partial/full, overpay blocked), printable tax invoice, overdue shown by due date
+- Dashboard: active jobs, quotes awaiting, outstanding/overdue invoices, month receipts and spend, fleet availability, expiry alerts
+- Reports: job profitability by date range with CSV download (needs reports.financial)
 
-## Business model (decided 2026-11-01, replaces the earlier SaaS plan)
-One business, one installation. No public sign-up and no platform/multi-company admin. System name is generic ("Transport Manager", one constant in `src/config/app.ts`).
-- Database keeps the organization/role/permission structure but is locked to exactly one organization (migration 0008, unique index). RLS and `organization_id` on future tables stay as designed.
-- The business row was created for Damian's account as Owner (name "My Transport Business", rename later in Settings).
-- Owners create more Owner and Dispatcher logins at `/team` (temporary password shown once, forced change on first sign-in); owners can also reset passwords and disable/enable people. The last active owner cannot be disabled; owners cannot change their own access.
-- Removed: /platform, platform_admins checks. Table `platform_admins`, functions `provision_organization` (service role only) and `create_organization` (not callable by users) remain unused; drop in a later cleanup.
-- Subscription plans/usage limits (old Phase 8) are no longer planned.
+## Not built yet
+- Proof of delivery (photos/signature) and secure document storage with expiry notifications
+- Driver mobile/PWA view; live tracking views
+- Rate cards / pricing rules in Settings; WhatsApp share link
+- Customer page tabs (quotations/jobs/invoices); invoice line editing (cancel and recreate for now)
+- Fuel is not allocated to jobs in profitability yet
+- Audit log viewer; role/permission editor UI
 
-## Known issues / to do
-- ACTION (Damian): in Supabase dashboard (project transportos) Authentication > Sign In / Providers, turn OFF "Allow new users to sign up". Until then anyone can create a login (it has no access to any business data).
-- Advisor notes: `document_sequences` and `platform_admins` have RLS but no policies (intentional, service role only); `create_organization` is callable by signed-in users (intentional).
-- Members with `members.manage` could assign the Owner role; add a guard (only Owners assign Owner, cannot remove last Owner) before launch.
-- Add rate limit on company creation.
-- Vercel has Supabase-integration env vars (SUPABASE_URL, keys, POSTGRES_*) of unknown source project; verify they point at `transportos` (ref xetkenscwizknicfobdb) and not another project before using them.
-- Production target currently deploys feature/foundation because main is empty; set production branch to main after first merge.
+## Not yet click-tested in a browser
+Fleet/driver/maintenance/fuel/expenses, invoices/payments, dashboard, reports. Builds pass; database logic was tested earlier (quote → job → trips → invoice → payments).
 
-## Remaining (Phase 1)
-1. Company switcher for users in more than one company; invite staff to a company (owner-created logins).
-4. Server guard `requirePermission()` and Zod validation pattern.
-5. Cross-tenant test suite in repo.
-
-## Exact next task
-Test: sign in as Damian, open /team, create a Dispatcher, sign in as them and change password. Then customers module.
+## To do / actions for Damian
+- Supabase dashboard (project transportos) → Authentication → turn OFF "Allow new users to sign up".
+- Change the temporary password on first sign-in (it was shown in chat).
+- Cleanup migration later: drop platform_admins, provision_organization, create_organization.
+- Dispatcher template includes dispatch.override; remove if dispatchers should not override conflicts.
+- Guard so only Owners assign the Owner role; set production branch to main after merge.
