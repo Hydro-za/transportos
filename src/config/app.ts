@@ -1,2 +1,2 @@
-/** Generic product name. Change this one line to rename the system everywhere. */
-export const APP_NAME = "Transport Manager";
+/** Product name used throughout the interface and page metadata. */
+export const APP_NAME = "Transport OS";
