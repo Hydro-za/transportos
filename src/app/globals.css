@@ -37,47 +37,45 @@
 }
 
 * { box-sizing: border-box; }
-
 html { min-height: 100%; }
-
 body {
   min-height: 100vh;
   margin: 0;
+  overflow-x: clip;
   background: var(--bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-
 ::selection { background: var(--accent-soft); }
-
 button, input, select, textarea { font: inherit; }
-
-button, a, input, select, textarea {
-  -webkit-tap-highlight-color: transparent;
-}
-
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 a { text-decoration: none; }
-
 :focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
   outline-offset: 2px;
 }
-
-input, select, textarea {
-  color: var(--text);
-}
-
-input::placeholder, textarea::placeholder {
-  color: var(--muted);
-  opacity: .75;
-}
-
+input, select, textarea { color: var(--text); }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: .75; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--muted) 25%, transparent); border: 2px solid transparent; border-radius: 99px; background-clip: padding-box; }
 ::-webkit-scrollbar-track { background: transparent; }
 
+.mobile-menu-sheet {
+  max-height: min(82dvh, 720px);
+  overflow-y: auto;
+  animation: mobile-sheet-in 180ms ease-out;
+}
+@keyframes mobile-sheet-in {
+  from { transform: translateY(18px); opacity: .75; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 767px) {
+  input, select, textarea { font-size: 16px; }
+  button, a { touch-action: manipulation; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
