@@ -9,6 +9,8 @@ import { formatDateTime } from "@/lib/forms";
 import { JOB_LABEL, JOB_STATUSES, JOB_TONE, TRIP_TONE } from "@/lib/status";
 import type { FieldDef } from "@/lib/forms";
 import { JOB_FIELDS } from "../fields";
+import { UploadForm } from "@/components/upload-form";
+import { DocumentList } from "@/components/document-list";
 import { createInvoiceFromJob } from "../../invoices/actions";
 import { addJobEvent, allocateTrip, setJobStatus, setTripStatus, updateJob } from "../actions";
 
@@ -28,6 +30,11 @@ export default async function JobPage({ params, searchParams }: { params: Promis
   if (!job) notFound();
   const { data: events } = await ctx.supabase.from("job_events").select("*").eq("job_id", id).order("created_at", { ascending: false });
   const canWrite = ctx.permissions.has("jobs.write");
+  const canDocs = ctx.permissions.has("documents.read");
+  const { data: docs } = canDocs
+    ? await ctx.supabase.from("documents").select("id, title, category, size_bytes, expiry_date, created_at").eq("entity_type", "job").eq("entity_id", id).order("created_at", { ascending: false })
+    : { data: [] };
+  const todaySast = new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Johannesburg" });
   const canDispatch = ctx.permissions.has("dispatch.manage");
 
   const canSeeDispatch = ctx.permissions.has("dispatch.read");
@@ -145,6 +152,13 @@ export default async function JobPage({ params, searchParams }: { params: Promis
           </dl>
         )}
       </Card>
+
+      {canDocs ? (
+        <Card title="Documents and proof of delivery">
+          {ctx.permissions.has("documents.write") ? <div className="mb-4"><UploadForm entityType="job" entityId={job.id} defaultCategory="pod" returnTo={`/jobs/${job.id}`} label="Upload" /></div> : null}
+          <DocumentList docs={docs ?? []} returnTo={`/jobs/${job.id}`} canDelete={ctx.permissions.has("documents.write")} today={todaySast} />
+        </Card>
+      ) : null}
 
       <Card title="Timeline">
         {canWrite ? (
