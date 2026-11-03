@@ -27,8 +27,8 @@ export function Field({
         autoComplete={autoComplete}
         placeholder={placeholder}
         minLength={minLength}
-        className="mt-2 block w-full rounded-xl border px-4 py-3 text-[15px] outline-none transition focus:ring-4"
-        style={{ background: "var(--surface-soft)", borderColor: "var(--border)", color: "var(--text)", "--tw-ring-color": "var(--accent-soft)" } as React.CSSProperties}
+        className="mt-2 block w-full rounded-xl border px-4 py-3 text-[15px] outline-none transition focus:ring-4 focus:ring-[var(--accent-soft)]"
+        style={{ background: "var(--surface-soft)", borderColor: "var(--border)", color: "var(--text)" }}
       />
     </label>
   );
