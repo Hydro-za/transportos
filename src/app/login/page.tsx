@@ -1,5 +1,5 @@
 import { APP_NAME } from "@/config/app";
-import { AuthCard, Field, Notice, SubmitButton } from "@/components/ui";
+import { Field, Notice, SubmitButton } from "@/components/ui";
 import { signIn } from "./actions";
 import { Truck, ShieldCheck, ArrowUpRight, Route, PackageCheck } from "lucide-react";
 
