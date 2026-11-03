@@ -31,7 +31,7 @@ export function MobileNav({ items }: { items: NavItem[] }) {
       {open && (
         <div className="fixed inset-0 z-50 md:hidden" role="presentation">
           <button aria-label="Close navigation menu" className="absolute inset-0 bg-black/35 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
-          <section role="dialog" aria-modal="true" aria-label="All sections" className="mobile-menu-sheet absolute inset-x-0 bottom-0 rounded-t-[28px] border px-5 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-4 shadow-2xl" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          <section id="mobile-sections" role="dialog" aria-modal="true" aria-label="All sections" className="mobile-menu-sheet absolute inset-x-0 bottom-0 rounded-t-[28px] border px-5 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-4 shadow-2xl" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
             <div className="mx-auto mb-4 h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
             <div className="mb-5 flex items-center justify-between">
               <div>
