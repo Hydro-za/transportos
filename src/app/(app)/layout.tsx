@@ -4,6 +4,7 @@ import { signOut } from "@/app/login/actions";
 import { APP_NAME } from "@/config/app";
 import { NAV } from "@/config/nav";
 import { SideNav } from "@/components/side-nav";
+import { Truck } from "lucide-react";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const ctx = await getContext();
@@ -11,7 +12,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   const signOutButton = (
     <form action={signOut}>
-      <button type="submit" className="w-full rounded-xl border px-3 py-2 text-sm font-medium" style={{ borderColor: "var(--border)" }}>
+      <button
+        type="submit"
+        className="w-full rounded-xl border px-3 py-2 text-xs font-medium transition-colors hover:bg-[var(--surface-soft)]"
+        style={{ borderColor: "var(--border)", color: "var(--muted)" }}
+      >
         Sign out
       </button>
     </form>
@@ -20,35 +25,67 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen md:flex">
       <aside
-        className="hidden border-r p-4 md:sticky md:top-0 md:flex md:h-screen md:w-60 md:flex-col md:justify-between"
-        style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+        className="hidden border-r md:sticky md:top-0 md:flex md:h-screen md:w-[258px] md:shrink-0 md:flex-col md:justify-between md:px-4 md:py-5"
+        style={{ background: "var(--sidebar)", borderColor: "var(--border)" }}
       >
         <div>
-          <p className="px-3 text-xs font-medium uppercase tracking-wide" style={{ color: "var(--muted)" }}>
-            {APP_NAME}
-          </p>
-          <p className="mb-4 px-3 text-base font-semibold">{ctx.businessName || "No business"}</p>
+          <div className="mb-8 flex items-center gap-3 px-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl text-white shadow-sm" style={{ background: "var(--accent)" }}>
+              <Truck size={20} strokeWidth={1.9} />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold tracking-tight">{APP_NAME}</p>
+              <p className="text-[11px]" style={{ color: "var(--muted)" }}>LOGISTICS WORKSPACE</p>
+            </div>
+          </div>
+
+          <div className="mb-6 rounded-2xl border px-3 py-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+            <p className="mb-1 text-[10px] font-semibold tracking-[0.12em]" style={{ color: "var(--muted)" }}>CURRENT ORGANISATION</p>
+            <p className="truncate text-sm font-semibold">{ctx.businessName || "No business"}</p>
+          </div>
+
           <SideNav items={items} />
         </div>
-        <div className="space-y-2">
-          <p className="px-1 text-xs" style={{ color: "var(--muted)" }}>
-            {ctx.user.email} · {ctx.roleName || "No role"}
-          </p>
+
+        <div className="rounded-2xl border p-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          <div className="mb-3 flex min-w-0 items-center gap-2">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold" style={{ background: "var(--surface-soft)", color: "var(--accent)" }}>
+              {(ctx.user.email?.[0] ?? "U").toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium">{ctx.user.email}</p>
+              <p className="text-[11px]" style={{ color: "var(--muted)" }}>{ctx.roleName || "Team member"}</p>
+            </div>
+          </div>
           {signOutButton}
         </div>
       </aside>
 
       <div className="min-w-0 flex-1">
         <div
-          className="flex items-center justify-between gap-2 border-b px-3 py-2 md:hidden"
-          style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+          className="sticky top-0 z-20 border-b px-3 py-3 md:hidden"
+          style={{ background: "color-mix(in srgb, var(--surface) 92%, transparent)", borderColor: "var(--border)", backdropFilter: "blur(18px)" }}
         >
-          <div className="min-w-0 flex-1 overflow-x-auto">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white" style={{ background: "var(--accent)" }}>
+                <Truck size={17} />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">{APP_NAME}</p>
+                <p className="truncate text-[10px]" style={{ color: "var(--muted)" }}>{ctx.businessName || "No business"}</p>
+              </div>
+            </div>
+            <div className="w-20 shrink-0">{signOutButton}</div>
+          </div>
+          <div className="-mx-1 overflow-x-auto px-1 pb-1">
             <SideNav items={items} horizontal />
           </div>
-          {signOutButton}
         </div>
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+
+        <main className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-9">
+          {children}
+        </main>
       </div>
     </div>
   );

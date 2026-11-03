@@ -1,32 +1,83 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f5f5f7;
+  color-scheme: light;
+  --bg: #f5f6f8;
   --surface: #ffffff;
-  --border: #e5e5ea;
-  --text: #1d1d1f;
-  --muted: #6e6e73;
-  --accent: #0b3d91;
+  --surface-soft: #f8f9fb;
+  --border: #e7e9ee;
+  --text: #171a21;
+  --muted: #737b89;
+  --accent: #2457d6;
+  --accent-soft: #edf3ff;
+  --success: #16845b;
+  --warning: #b7791f;
+  --danger: #c24145;
+  --sidebar: #fbfcfe;
+  --shadow-card: 0 2px 10px rgba(19, 31, 55, 0.035), 0 14px 34px rgba(19, 31, 55, 0.025);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111214;
-    --surface: #1b1c1f;
-    --border: #2c2d31;
-    --text: #f5f5f7;
-    --muted: #a1a1a6;
-    --accent: #4c8dff;
+    color-scheme: dark;
+    --bg: #101216;
+    --surface: #191d24;
+    --surface-soft: #20252e;
+    --border: #2b313c;
+    --text: #f3f5f8;
+    --muted: #9aa3b2;
+    --accent: #78a2ff;
+    --accent-soft: #202d49;
+    --success: #54c99a;
+    --warning: #e9b35c;
+    --danger: #ff777e;
+    --sidebar: #151920;
+    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.16);
   }
 }
 
+* { box-sizing: border-box; }
+
+html { min-height: 100%; }
+
 body {
+  min-height: 100vh;
+  margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
+::selection { background: var(--accent-soft); }
+
+button, input, select, textarea { font: inherit; }
+
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a { text-decoration: none; }
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  outline-offset: 2px;
+}
+
+input, select, textarea {
+  color: var(--text);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--muted);
+  opacity: .75;
+}
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--muted) 25%, transparent); border: 2px solid transparent; border-radius: 99px; background-clip: padding-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
 @media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
