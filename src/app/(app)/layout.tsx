@@ -4,6 +4,7 @@ import { signOut } from "@/app/login/actions";
 import { APP_NAME } from "@/config/app";
 import { NAV } from "@/config/nav";
 import { SideNav } from "@/components/side-nav";
+import { MobileNav } from "@/components/mobile-nav";
 import { Truck } from "lucide-react";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -14,7 +15,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <form action={signOut}>
       <button
         type="submit"
-        className="w-full rounded-xl border px-3 py-2 text-xs font-medium transition-colors hover:bg-[var(--surface-soft)]"
+        className="rounded-xl border px-3 py-2 text-xs font-medium transition-colors hover:bg-[var(--surface-soft)]"
         style={{ borderColor: "var(--border)", color: "var(--muted)" }}
       >
         Sign out
@@ -62,31 +63,29 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="min-w-0 flex-1">
-        <div
-          className="sticky top-0 z-20 border-b px-3 py-3 md:hidden"
-          style={{ background: "color-mix(in srgb, var(--surface) 92%, transparent)", borderColor: "var(--border)", backdropFilter: "blur(18px)" }}
+        <header
+          className="sticky top-0 z-30 border-b px-4 py-3 md:hidden"
+          style={{ background: "color-mix(in srgb, var(--surface) 94%, transparent)", borderColor: "var(--border)", backdropFilter: "blur(20px)" }}
         >
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white" style={{ background: "var(--accent)" }}>
-                <Truck size={17} />
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white" style={{ background: "var(--accent)" }}>
+                <Truck size={18} strokeWidth={1.9} />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold">{APP_NAME}</p>
-                <p className="truncate text-[10px]" style={{ color: "var(--muted)" }}>{ctx.businessName || "No business"}</p>
+                <p className="truncate text-sm font-semibold tracking-tight">{APP_NAME}</p>
+                <p className="truncate text-[11px]" style={{ color: "var(--muted)" }}>{ctx.businessName || "No business"}</p>
               </div>
             </div>
-            <div className="w-20 shrink-0">{signOutButton}</div>
+            {signOutButton}
           </div>
-          <div className="-mx-1 overflow-x-auto px-1 pb-1">
-            <SideNav items={items} horizontal />
-          </div>
-        </div>
+        </header>
 
-        <main className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-9">
+        <main className="mx-auto w-full max-w-[1600px] px-4 py-5 pb-28 sm:px-6 sm:py-8 sm:pb-32 lg:px-9 md:pb-8">
           {children}
         </main>
       </div>
+      <MobileNav items={items} />
     </div>
   );
 }
