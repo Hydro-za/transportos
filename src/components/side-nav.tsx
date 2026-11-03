@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ChartNoAxesCombined,
+  BarChart3,
   ClipboardList,
   FileText,
   Fuel,
@@ -33,7 +33,7 @@ const ICONS = {
   "/maintenance": Wrench,
   "/expenses": Fuel,
   "/documents": FolderOpen,
-  "/reports": ChartNoAxesCombined,
+  "/reports": BarChart3,
   "/team": Users,
   "/settings": Settings,
 } as const;
