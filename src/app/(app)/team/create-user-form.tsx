@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { createUserAccount, type CreateUserState } from "./actions";
 import { Field, Notice, SelectField, SubmitButton } from "@/components/ui";
 
-export function CreateUserForm() {
+export function CreateUserForm({ drivers = [] }: { drivers?: { id: string; full_name: string }[] }) {
   const [state, action] = useActionState<CreateUserState, FormData>(createUserAccount, null);
   return (
     <div>
@@ -32,8 +32,10 @@ export function CreateUserForm() {
           options={[
             { value: "Dispatcher", label: "Dispatcher" },
             { value: "Owner", label: "Owner" },
+            { value: "Driver", label: "Driver (mobile trips view)" },
           ]}
         />
+        <SelectField label="Driver record (only for the Driver role)" name="driverId" options={[{ value: "", label: "Not a driver" }, ...drivers.map((d) => ({ value: d.id, label: d.full_name }))]} />
         <SubmitButton>Create login</SubmitButton>
       </form>
     </div>

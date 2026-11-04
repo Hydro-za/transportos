@@ -16,6 +16,8 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
     .eq("organization_id", organizationId)
     .order("created_at", { ascending: true });
 
+  const { data: freeDrivers } = await admin.from("drivers").select("id, full_name").eq("organization_id", organizationId).eq("status", "active").is("user_id", null).order("full_name");
+
   const ids = (members ?? []).map((m) => m.user_id);
   const { data: profiles } = await admin.from("user_profiles").select("id, full_name").in("id", ids);
   const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 200 });
@@ -28,7 +30,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Team</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-            Create owner and dispatcher logins. Each person gets a temporary password to change on first sign-in.
+            Create owner, dispatcher and driver logins. Each person gets a temporary password to change on first sign-in.
           </p>
         </div>
       </header>
@@ -41,7 +43,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
 
       <section className="mt-8 rounded-3xl border p-6" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <h2 className="mb-4 text-lg font-medium">New login</h2>
-        <CreateUserForm />
+        <CreateUserForm drivers={freeDrivers ?? []} />
       </section>
 
       <section className="mt-8 rounded-3xl border p-6" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>

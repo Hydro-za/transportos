@@ -14,12 +14,13 @@ export type CreateUserState = {
 
 export type ResetState = { error?: string; memberId?: string; password?: string } | null;
 
-const ASSIGNABLE_ROLES = ["Owner", "Dispatcher"] as const;
+const ASSIGNABLE_ROLES = ["Owner", "Dispatcher", "Driver"] as const;
 
 const createSchema = z.object({
   fullName: z.string().trim().min(2).max(100),
   email: z.string().trim().toLowerCase().email().max(254),
   role: z.enum(ASSIGNABLE_ROLES),
+  driverId: z.union([z.literal(""), z.string().uuid()]),
 });
 
 function tempPassword() {
@@ -33,11 +34,19 @@ export async function createUserAccount(_prev: CreateUserState, formData: FormDa
     fullName: formData.get("fullName"),
     email: formData.get("email"),
     role: formData.get("role"),
+    driverId: String(formData.get("driverId") ?? ""),
   });
-  if (!parsed.success) return { error: "Enter a name, a valid email and choose Owner or Dispatcher." };
+  if (!parsed.success) return { error: "Enter a name, a valid email and choose a role." };
   if (parsed.data.role === "Owner" && roleName !== "Owner") return { error: "Only an owner can create another owner." };
 
   const admin = createAdminClient();
+
+  if (parsed.data.role === "Driver") {
+    if (!parsed.data.driverId) return { error: "Choose the driver record this login belongs to (add the driver under Drivers & Staff first)." };
+    const { data: drv } = await admin.from("drivers").select("id, user_id").eq("id", parsed.data.driverId).eq("organization_id", organizationId).maybeSingle();
+    if (!drv) return { error: "Driver record not found." };
+    if (drv.user_id) return { error: "That driver already has a login." };
+  }
 
   const { data: role } = await admin
     .from("roles")
@@ -69,6 +78,15 @@ export async function createUserAccount(_prev: CreateUserState, formData: FormDa
   if (memberError) {
     await admin.auth.admin.deleteUser(created.user.id); // roll back the login
     return { error: "Could not add the user. Nothing was saved, please try again." };
+  }
+
+  if (parsed.data.role === "Driver") {
+    const { error: linkError } = await admin.from("drivers").update({ user_id: created.user.id }).eq("id", parsed.data.driverId).eq("organization_id", organizationId).is("user_id", null);
+    if (linkError) {
+      await admin.from("organization_members").delete().eq("user_id", created.user.id).eq("organization_id", organizationId);
+      await admin.auth.admin.deleteUser(created.user.id);
+      return { error: "Could not link the login to the driver. Nothing was saved, please try again." };
+    }
   }
 
   revalidatePath("/team");

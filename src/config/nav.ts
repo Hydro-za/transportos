@@ -3,6 +3,7 @@ export type NavItem = { href: string; label: string; permission?: string };
 /** Only pages that exist are listed. Items are hidden when the user lacks the permission (the pages enforce it too). */
 export const NAV: NavItem[] = [
   { href: "/dashboard", label: "Overview" },
+  { href: "/driver", label: "My trips", permission: "driver.access" },
   { href: "/quotations", label: "Quotations", permission: "quotations.read" },
   { href: "/jobs", label: "Jobs & Loads", permission: "jobs.read" },
   { href: "/dispatch", label: "Dispatch", permission: "dispatch.read" },

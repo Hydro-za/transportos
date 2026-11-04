@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getContext } from "@/server/auth/session";
 import { formatZar } from "@/lib/money";
 import { JOB_LABEL } from "@/lib/status";
@@ -27,6 +28,7 @@ export default async function DashboardPage() {
       </div>
     );
   }
+  if (ctx.permissions.has("driver.access") && !ctx.permissions.has("jobs.read")) redirect("/driver");
   const can = (p: string) => ctx.permissions.has(p);
   const sb = ctx.supabase;
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Africa/Johannesburg" });
