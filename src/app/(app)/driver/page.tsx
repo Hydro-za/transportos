@@ -4,6 +4,11 @@ import { formatDateTime } from "@/lib/forms";
 import { TRIP_TONE } from "@/lib/status";
 import { driverAddNote, driverSetStatus, driverUploadPod } from "./actions";
 
+type Trip = {
+  trip_id: string; trip_status: string; planned_start: string; planned_end: string; job_id: string; job_number: string; job_title: string;
+  collection_address: string | null; delivery_address: string | null; cargo_description: string | null; weight_kg: number | null;
+  customer_instructions: string | null; customer_name: string; vehicle_registration: string | null; trailer_registration: string | null; pod_count: number;
+};
 const bd = { borderColor: "var(--border)" } as const;
 const maps = (a: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a)}`;
 
@@ -11,7 +16,7 @@ export default async function DriverPage({ searchParams }: { searchParams: Promi
   const ctx = await requireAccess("driver.access");
   const { saved, error } = await searchParams;
   const { data: trips } = await ctx.supabase.rpc("driver_trips");
-  const rows = trips ?? [];
+  const rows = (trips ?? []) as Trip[];
   return (
     <div className="max-w-xl">
       <PageHeader title="My trips" subtitle="Jobs allocated to you. Tap to update progress." />
