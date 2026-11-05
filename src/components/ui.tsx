@@ -75,7 +75,7 @@ export function SelectField({ label, name, options }: { label: string; name: str
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
   return (
-    <header className="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <header className="page-enter mb-7 flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 className="text-[26px] font-semibold tracking-[-0.04em] sm:text-3xl">{title}</h1>
         {subtitle ? <p className="mt-1.5 text-sm leading-6" style={{ color: "var(--muted)" }}>{subtitle}</p> : null}
@@ -87,7 +87,7 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
 
 export function Card({ title, children }: { title?: string; children: ReactNode }) {
   return (
-    <section className="mb-6 rounded-2xl border p-5 shadow-sm transition-shadow sm:p-6" style={{ background: "var(--surface)", borderColor: "var(--border)", boxShadow: "var(--shadow-card)" }}>
+    <section className="glass-panel mb-6 rounded-2xl p-5 transition-shadow duration-200 sm:p-6">
       {title ? <h2 className="mb-4 text-base font-semibold tracking-tight">{title}</h2> : null}
       {children}
     </section>

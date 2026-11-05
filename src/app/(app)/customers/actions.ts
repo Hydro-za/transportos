@@ -65,6 +65,36 @@ export async function createCustomer(_prev: FormState, fd: FormData): Promise<Fo
   redirect(`/customers/${data.id}`);
 }
 
+
+export async function createCustomerForQuotation(input: {
+  name: string;
+  contact_name?: string;
+  phone?: string;
+  email?: string;
+}) {
+  const { supabase, organizationId } = await requireAccess("customers.write");
+  const values: Record<string, string> = {
+    name: input.name.trim(), registration_no: "", vat_no: "",
+    contact_name: input.contact_name?.trim() ?? "", phone: input.phone?.trim() ?? "",
+    email: input.email?.trim() ?? "", payment_terms_days: "30", credit_limit: "0",
+    billing_address: "", collection_address: "", delivery_address: "",
+    status: "active", notes: "",
+  };
+  const { row, error } = toRow(values);
+  if (!row) return { ok: false as const, error: error ?? "Check the customer details." };
+  const { data, error: dbError } = await supabase.from("customers")
+    .insert({ ...row, organization_id: organizationId })
+    .select("id, name, collection_address, delivery_address, payment_terms_days")
+    .single();
+  if (dbError || !data) return {
+    ok: false as const,
+    error: dbError?.code === "23505" ? "A customer with that name already exists." : "Could not save the customer.",
+  };
+  revalidatePath("/customers");
+  revalidatePath("/quotations/new");
+  return { ok: true as const, customer: data };
+}
+
 export async function updateCustomer(_prev: FormState, fd: FormData): Promise<FormState> {
   const { supabase, organizationId } = await requireAccess("customers.write");
   const id = z.string().uuid().safeParse(fd.get("id"));

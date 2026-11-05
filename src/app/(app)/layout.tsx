@@ -5,7 +5,7 @@ import { APP_NAME } from "@/config/app";
 import { NAV } from "@/config/nav";
 import { SideNav } from "@/components/side-nav";
 import { MobileNav } from "@/components/mobile-nav";
-import { Truck } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const ctx = await getContext();
@@ -31,9 +31,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       >
         <div>
           <div className="mb-8 flex items-center gap-3 px-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl text-white shadow-sm" style={{ background: "var(--accent)" }}>
-              <Truck size={20} strokeWidth={1.9} />
-            </div>
+            <BrandMark size={42} />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-tight">{APP_NAME}</p>
               <p className="text-[11px]" style={{ color: "var(--muted)" }}>LOGISTICS WORKSPACE</p>
@@ -69,9 +67,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         >
           <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white" style={{ background: "var(--accent)" }}>
-                <Truck size={18} strokeWidth={1.9} />
-              </div>
+              <BrandMark size={38} />
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold tracking-tight">{APP_NAME}</p>
                 <p className="truncate text-[11px]" style={{ color: "var(--muted)" }}>{ctx.businessName || "No business"}</p>
