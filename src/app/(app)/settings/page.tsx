@@ -9,10 +9,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const { saved } = await searchParams;
   const s = await getBusinessSettings(ctx);
   return (
-    <div>
-      <PageHeader title="Settings" subtitle="Business details and defaults used on quotations and invoices." />
+    <div className="page-enter">
+      <PageHeader title="Settings" subtitle="Manage your organisation details and the defaults used across quotations and invoices." />
       {saved ? <Notice kind="info">Settings saved.</Notice> : null}
-      <Card>
+      <Card title="Business profile & defaults">
         <EntityForm
           fields={SETTINGS_FIELDS}
           action={saveSettings}
