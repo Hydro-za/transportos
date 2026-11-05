@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-05
+- Documents with private storage and proof of delivery; driver mobile view with driver logins
+
 ## 2026-11-02
 - Fleet, trailers, drivers, maintenance, fuel, expenses with alerts
 - Invoices from jobs, payments, printable invoice, live dashboard, job profitability report with CSV
